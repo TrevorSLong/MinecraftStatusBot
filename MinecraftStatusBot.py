@@ -49,29 +49,21 @@ print("The server has {0} players and replied in {1} ms".format(status.players.o
     
 ##############Changes bot status (working)###########################################################################################
 class PlayerCount(commands.Cog):
-    """
-    This example uses tasks provided by discord.ext to create a task that posts guild count to top.gg every 30 minutes.
-    """
-
     def __init__(self, bot):
-        self.bot = bot
         self.index = 0
         self.printer.before_loop(bot.wait_until_ready())
         self.printer.start()
 
     def cog_unload(self):
-        self.update_stats.cancel()
+        self.printer.cancel()
 
-    @tasks.loop(minutes=2)
-    async def update_stats(self):
-        """This function runs every 30 minutes to automatically update your server count."""
-        await self.bot.wait_until_ready()
-        try:
-            server = MinecraftServer.lookup(SERVER)
-            status = server.status()
-            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
-        except Exception as e:
-            print("Failed to update player count.")
+    @tasks.loop(seconds=5.0)
+    async def printer(self):
+        print(self.index)
+        self.index += 1
+        server = MinecraftServer.lookup(SERVER)
+        status = server.status()
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=" {0} players and online!".format(status.players.online, status.latency)))
 
 
 def setup(bot):
