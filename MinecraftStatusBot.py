@@ -47,23 +47,30 @@ server = MinecraftServer.lookup(SERVER)
 status = server.status()
 print("The server has {0} players and replied in {1} ms".format(status.players.online, status.latency))
 
-##############Changes bot status (working)###########################################################################################
-@tasks.loop(seconds=60)
-async def update_status():
-    server = MinecraftServer.lookup(SERVER)
-    status = server.status()
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
-        
-    print("Status Updated")
 
-@update_status.before_loop
-async def update_status_before():
+@bot.event
+async def on_ready():
     server = MinecraftServer.lookup(SERVER)
     status = server.status()
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
        
+##############Changes bot status (working)###########################################################################################
+#@tasks.loop(seconds=60)
+#async def update_status():
+#    server = MinecraftServer.lookup(SERVER)
+#    status = server.status()
+#    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
+#        
+#    print("Status Updated")
 
-update_status.start()
+#@update_status.before_loop
+#async def update_status_before():
+#    server = MinecraftServer.lookup(SERVER)
+#    status = server.status()
+#    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
+       
+
+#update_status.start()
 
 ##############Reponds to ping (working)########################################################################################################
 @slash.slash(
