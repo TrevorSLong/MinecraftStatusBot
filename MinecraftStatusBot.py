@@ -48,7 +48,7 @@ status = server.status()
 print("The server has {0} players and replied in {1} ms".format(status.players.online, status.latency))
 
 ##############Changes bot status (working)###########################################################################################
-@loop(seconds=60)
+@tasks.loop(seconds=60)
 async def update_status():
     server = MinecraftServer.lookup(SERVER)
     status = server.status()
