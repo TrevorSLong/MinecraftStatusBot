@@ -48,23 +48,23 @@ status = server.status()
 print("The server has {0} players and replied in {1} ms".format(status.players.online, status.latency))
 
 ##############Changes bot status (working)###########################################################################################
-class MyCog(commands.Cog):
-    def __init__(self):
-        self.index = 0
-        self.printer.start()
-
-    def cog_unload(self):
-        self.printer.cancel()
-
-    @tasks.loop(seconds=5.0)
-    async def printer(self):
-        print(self.index)
-        self.index += 1
+@loop(seconds=60)
+async def update_status():
+    server = MinecraftServer.lookup(SERVER)
+    status = server.status()
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
         
-        server = MinecraftServer.lookup(SERVER)
-        status = server.status()
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
-        
+    print("Status Updated")
+
+@update_status.before_loop
+async def update_status_before():
+    server = MinecraftServer.lookup(SERVER)
+    status = server.status()
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
+       
+
+update_status.start()
+
 ##############Reponds to ping (working)########################################################################################################
 @slash.slash(
 	description="Responds with Pong and the bots server latency", 	# ADDS THIS VALUE TO THE $HELP PING MESSAGE.
