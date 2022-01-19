@@ -49,11 +49,12 @@ print("The server has {0} players and replied in {1} ms".format(status.players.o
     
 ##############Changes bot status (working)###########################################################################################
 async def background_task():
-    server = MinecraftServer.lookup(SERVER)
-    status = server.status()
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
+    
     while True:
         time = 120 # 86400
+        server = MinecraftServer.lookup(SERVER)
+        status = server.status()
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
         await asyncio.sleep(time)
         
 
