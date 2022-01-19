@@ -78,7 +78,7 @@ class TopGG(commands.Cog):
             await self.dblpy.post_guild_count(server_count)
             server = MinecraftServer.lookup(SERVER)
             status = server.status()
-            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=" {0} players and online!".format(status.players.online, status.latency)))
+            await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=" {0} players and online!".format(status.players.online, status.latency)))
             logger.warning('Posted server count ({})'.format(server_count))
         except Exception as e:
             logger.warning('Failed to post server count\n{}: {}'.format(type(e).__name__, e))
