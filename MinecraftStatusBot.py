@@ -52,7 +52,7 @@ print("The server has {0} players and replied in {1} ms".format(status.players.o
 async def on_ready():
     server = MinecraftServer.lookup(SERVER)
     status = server.status()
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=" {0} players and online!".format(status.players.online, status.latency)))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=" --{0} players online!--".format(status.players.online, status.latency)))
 
 ##############Changes bot status (working)###########################################################################################
 class TopGG(commands.Cog):
