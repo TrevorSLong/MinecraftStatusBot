@@ -46,7 +46,7 @@ slash = SlashCommand(bot, sync_commands=True) #Declares command prefix
 ##############Changes bot status (working)###########################################################################################
 @tasks.loop(seconds=60)
 async def serverplayercount():
-    server = SERVER #MinecraftServer.lookup("mc.hypixel.net")
+    server = MinecraftServer.lookup(SERVER)
     status = server.status()
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
     
@@ -64,7 +64,7 @@ async def ping(ctx:SlashContext):
 	description="Responds with player count and server latency", 	# ADDS THIS VALUE TO THE $HELP PING MESSAGE.
 )
 async def pingMC(ctx:SlashContext):
-    server = SERVER #MinecraftServer.lookup("mc.hypixel.net")
+    server = MinecraftServer.lookup(SERVER)
     status = server.status()
 
     await ctx.send("The server has {0} players and replied in {1} ms".format(status.players.online, status.latency)) # SENDS A MESSAGE TO THE CHANNEL USING THE CONTEXT OBJECT.
