@@ -46,31 +46,17 @@ slash = SlashCommand(bot, sync_commands=True) #Declares command prefix
 server = MinecraftServer.lookup(SERVER)
 status = server.status()
 print("The server has {0} players and replied in {1} ms".format(status.players.online, status.latency))
-
-
-@bot.event
-async def on_ready():
+    
+##############Changes bot status (working)###########################################################################################
+async def background_task():
     server = MinecraftServer.lookup(SERVER)
     status = server.status()
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
-       
-##############Changes bot status (working)###########################################################################################
-#@tasks.loop(seconds=60)
-#async def update_status():
-#    server = MinecraftServer.lookup(SERVER)
-#    status = server.status()
-#    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
-#        
-#    print("Status Updated")
+    while True:
+        time = 120 # 86400
+        await asyncio.sleep(time)
+        
 
-#@update_status.before_loop
-#async def update_status_before():
-#    server = MinecraftServer.lookup(SERVER)
-#    status = server.status()
-#    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
-       
-
-#update_status.start()
 
 ##############Reponds to ping (working)########################################################################################################
 @slash.slash(
@@ -90,4 +76,5 @@ async def serverstatus(ctx:SlashContext):
 
     await ctx.send("The server has {0} players and replied in {1} ms".format(status.players.online, status.latency)) # SENDS A MESSAGE TO THE CHANNEL USING THE CONTEXT OBJECT.
 
+bot.loop.create_task(background_task())
 bot.run(TOKEN)
