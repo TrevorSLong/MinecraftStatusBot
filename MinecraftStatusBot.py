@@ -48,17 +48,34 @@ status = server.status()
 print("The server has {0} players and replied in {1} ms".format(status.players.online, status.latency))
     
 ##############Changes bot status (working)###########################################################################################
-async def background_task():
-    await bot.wait_until_ready()
-    while not bot.is_closed:
+class PlayerCount(commands.Cog):
+    """
+    This example uses tasks provided by discord.ext to create a task that posts guild count to top.gg every 30 minutes.
+    """
 
-        server = MinecraftServer.lookup(SERVER)
-        status = server.status()
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
+    def __init__(self, bot):
+        self.bot = bot
+        self.index = 0
+        self.printer.before_loop(bot.wait_until_ready())
+        self.printer.start()
 
-        await asyncio.sleep(120)
-        
+    def cog_unload(self):
+        self.update_stats.cancel()
 
+    @tasks.loop(minutes=2)
+    async def update_stats(self):
+        """This function runs every 30 minutes to automatically update your server count."""
+        await self.bot.wait_until_ready()
+        try:
+            server = MinecraftServer.lookup(SERVER)
+            status = server.status()
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
+        except Exception as e:
+            print("Failed to update player count.")
+
+
+def setup(bot):
+    bot.add_cog(PlayerCount(bot))
 
 ##############Reponds to ping (working)########################################################################################################
 @slash.slash(
@@ -78,5 +95,4 @@ async def serverstatus(ctx:SlashContext):
 
     await ctx.send("The server has {0} players and replied in {1} ms".format(status.players.online, status.latency)) # SENDS A MESSAGE TO THE CHANNEL USING THE CONTEXT OBJECT.
 
-bot.loop.create_task(background_task())
 bot.run(TOKEN)
