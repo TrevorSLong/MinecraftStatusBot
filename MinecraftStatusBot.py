@@ -62,8 +62,6 @@ class TopGG(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.token = 12345  # set this to your DBL token
-        self.dblpy = dbl.DBLClient(self.bot, self.token)
         self.update_stats.start()
 
     def cog_unload(self):
@@ -71,15 +69,13 @@ class TopGG(commands.Cog):
 
     @tasks.loop(minutes=2)
     async def update_stats(self):
-        """This function runs every 30 minutes to automatically update your server count."""
+        """This function runs every 2 minutes to automatically update your server count."""
         await self.bot.wait_until_ready()
         try:
-            server_count = len(self.bot.guilds)
-            await self.dblpy.post_guild_count(server_count)
             server = MinecraftServer.lookup(SERVER)
             status = server.status()
-            await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=" {0} players and online!".format(status.players.online, status.latency)))
-            logger.warning('Posted server count ({})'.format(server_count))
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=" {0} players online!".format(status.players.online, status.latency)))
+            logger.warning('Posted server count')
         except Exception as e:
             logger.warning('Failed to post server count\n{}: {}'.format(type(e).__name__, e))
 
