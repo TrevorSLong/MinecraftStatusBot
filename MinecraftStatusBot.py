@@ -43,6 +43,13 @@ print("Pinging server: " + SERVER)
 bot = commands.Bot(command_prefix='$') #, intents=discord.Intents.all()) #declare intents for bot
 slash = SlashCommand(bot, sync_commands=True) #Declares command prefix
 
+server = MinecraftServer.lookup(SERVER)
+status = server.status()
+print("The server has {0} players and replied in {1} ms".format(status.players.online, status.latency))
+
+latency = server.ping()
+print("The server replied in {0} ms".format(latency))
+
 ##############Changes bot status (working)###########################################################################################
 async def my_task(ctx, username):
     while True:
