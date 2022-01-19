@@ -48,26 +48,44 @@ status = server.status()
 print("The server has {0} players and replied in {1} ms".format(status.players.online, status.latency))
     
 ##############Changes bot status (working)###########################################################################################
-class PlayerCount(commands.Cog):
+class TopGG(commands.Cog):
+    """
+    This example uses tasks provided by discord.ext to create a task that posts guild count to top.gg every 30 minutes.
+    """
+
     def __init__(self, bot):
-        self.index = 0
-        self.printer.before_loop(bot.wait_until_ready())
-        self.printer.start()
+        self.bot = bot
+        self.token = dbl_token  # set this to your DBL token
+        self.dblpy = dbl.DBLClient(self.bot, self.token)
+        self.update_stats.start()
 
     def cog_unload(self):
-        self.printer.cancel()
+        self.update_stats.cancel()
 
-    @tasks.loop(seconds=5.0)
-    async def printer(self):
-        print(self.index)
-        self.index += 1
-        server = MinecraftServer.lookup(SERVER)
-        status = server.status()
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=" {0} players and online!".format(status.players.online, status.latency)))
+    @tasks.loop(minutes=30)
+    async def update_stats(self):
+        """This function runs every 30 minutes to automatically update your server count."""
+        await self.bot.wait_until_ready()
+        try:
+            server_count = len(self.bot.guilds)
+            await self.dblpy.post_guild_count(server_count)
+            server = MinecraftServer.lookup(SERVER)
+            status = server.status()
+            await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=" {0} players and online!".format(status.players.online, status.latency)))
+            logger.warning('Posted server count ({})'.format(server_count))
+        except Exception as e:
+            logger.warning('Failed to post server count\n{}: {}'.format(type(e).__name__, e))
 
 
 def setup(bot):
-    bot.add_cog(PlayerCount(bot))
+    bot.add_cog(TopGG(bot))
+
+
+global logger
+logger = logging.getLogger('bot')
+
+setup(bot)
+logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
 ##############Reponds to ping (working)########################################################################################################
 @slash.slash(
