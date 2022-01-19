@@ -38,9 +38,9 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN') #Grabs bot token from .env file
 print("Logging in with Bot Token " + TOKEN)
 SERVER = os.getenv('MCSERVER') #Grabs bot token from .env file
-print("Pinging server" + SERVER)
+print("Pinging server: " + SERVER)
 
-bot = commands.Bot(command_prefix='$', intents=discord.Intents.all()) #declare intents for bot
+bot = commands.Bot(command_prefix='$') #, intents=discord.Intents.all()) #declare intents for bot
 slash = SlashCommand(bot, sync_commands=True) #Declares command prefix
 
 ##############Changes bot status (working)###########################################################################################
