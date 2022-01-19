@@ -44,11 +44,22 @@ bot = commands.Bot(command_prefix='$') #, intents=discord.Intents.all()) #declar
 slash = SlashCommand(bot, sync_commands=True) #Declares command prefix
 
 ##############Changes bot status (working)###########################################################################################
-@tasks.loop(seconds=60)
-async def serverplayercount():
-    server = MinecraftServer.lookup(SERVER)
-    status = server.status()
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
+async def my_task(ctx, username):
+    while True:
+        server = MinecraftServer.lookup(SERVER)
+        status = server.status()
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
+        await asyncio.sleep(60)
+
+@bot.command()
+async def info(ctx, username):
+    bot.loop.create_task(my_task(ctx, username))
+
+#@tasks.loop(seconds=60)
+#async def serverplayercount():
+#    server = MinecraftServer.lookup(SERVER)
+#    status = server.status()
+#    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="{0} players play online!".format(status.players.online, status.latency)))
     
 
 ##############Reponds to ping (working)########################################################################################################
