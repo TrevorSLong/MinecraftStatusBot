@@ -47,6 +47,13 @@ server = MinecraftServer.lookup(SERVER)
 status = server.status()
 print("The server has {0} players and replied in {1} ms".format(status.players.online, status.latency))
     
+
+@bot.event
+async def on_ready():
+    server = MinecraftServer.lookup(SERVER)
+    status = server.status()
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=" {0} players and online!".format(status.players.online, status.latency)))
+
 ##############Changes bot status (working)###########################################################################################
 class TopGG(commands.Cog):
     """
@@ -62,7 +69,7 @@ class TopGG(commands.Cog):
     def cog_unload(self):
         self.update_stats.cancel()
 
-    @tasks.loop(minutes=30)
+    @tasks.loop(minutes=2)
     async def update_stats(self):
         """This function runs every 30 minutes to automatically update your server count."""
         await self.bot.wait_until_ready()
