@@ -55,7 +55,7 @@ class TopGG(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.token = dbl_token  # set this to your DBL token
+        self.token = 12345  # set this to your DBL token
         self.dblpy = dbl.DBLClient(self.bot, self.token)
         self.update_stats.start()
 
