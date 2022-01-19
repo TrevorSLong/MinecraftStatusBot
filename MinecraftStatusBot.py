@@ -84,7 +84,7 @@ async def ping(ctx:SlashContext):
 @slash.slash(
 	description="Responds with player count and server latency", 	# ADDS THIS VALUE TO THE $HELP PING MESSAGE.
 )
-async def pingMC(ctx:SlashContext):
+async def serverstatus(ctx:SlashContext):
     server = MinecraftServer.lookup(SERVER)
     status = server.status()
 
