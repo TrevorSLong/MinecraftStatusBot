@@ -21,18 +21,14 @@ import asyncio
 import logging
 import random
 import json
-import dbl
 from dotenv import load_dotenv
-from mcstatus import MinecraftServer
+from mcstatus import JavaServer
 from discord.ext import commands, tasks
 from discord import Member
 from discord import User
 from discord.ext.commands import has_permissions, MissingPermissions
 from discord.ext.commands import Bot, guild_only
 
-from discord_slash import SlashCommand, SlashContext #Importing slash command library
-from discord_slash.utils.manage_commands import create_option, create_choice
-from discord_slash.model import SlashCommandOptionType
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN') #Grabs bot token from .env file
@@ -40,70 +36,35 @@ print("Logging in with Bot Token " + TOKEN)
 SERVER = os.getenv('MCSERVER') #Grabs bot token from .env file
 print("Pinging server: " + SERVER)
 
-bot = commands.Bot(command_prefix='$') #, intents=discord.Intents.all()) #declare intents for bot
-slash = SlashCommand(bot, sync_commands=True) #Declares command prefix
+intents = discord.Intents.all() #Declare intents
+intents.typing = True
+bot = commands.Bot(command_prefix='$',intents= intents) #, intents=discord.Intents.all()) #declare intents for bot
 
-server = MinecraftServer.lookup(SERVER)
+server = JavaServer.lookup(SERVER)
 status = server.status()
 print("The server has {0} players and replied in {1} ms".format(status.players.online, status.latency))
     
-
+##############Change status########################################################################################################
 @bot.event
 async def on_ready():
-    server = MinecraftServer.lookup(SERVER)
+    server = JavaServer.lookup(SERVER)
     status = server.status()
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=" --{0} players online!--".format(status.players.online, status.latency)))
-
-##############Changes bot status (working)###########################################################################################
-class TopGG(commands.Cog):
-    """
-    This example uses tasks provided by discord.ext to create a task that posts guild count to top.gg every 30 minutes.
-    """
-
-    def __init__(self, bot):
-        self.bot = bot
-        self.update_stats.start()
-
-    def cog_unload(self):
-        self.update_stats.cancel()
-
-    @tasks.loop(minutes=2)
-    async def update_stats(self):
-        """This function runs every 2 minutes to automatically update your server count."""
-        await self.bot.wait_until_ready()
-        try:
-            server = MinecraftServer.lookup(SERVER)
-            status = server.status()
-            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=" {0} players online!".format(status.players.online, status.latency)))
-            logger.warning('Posted server count')
-        except Exception as e:
-            logger.warning('Failed to post server count\n{}: {}'.format(type(e).__name__, e))
-
-
-def setup(bot):
-    bot.add_cog(TopGG(bot))
-
-
-global logger
-logger = logging.getLogger('bot')
-
-setup(bot)
-logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=" {0} players online!".format(status.players.online, status.latency)))
 
 ##############Reponds to ping (working)########################################################################################################
-@slash.slash(
+@bot.command(
 	description="Responds with Pong and the bots server latency", 	# ADDS THIS VALUE TO THE $HELP PING MESSAGE.
 )
-async def ping(ctx:SlashContext):
+async def ping(ctx):
 	await ctx.send(f'🏓 Pong! {round(bot.latency * 1000)}ms') # SENDS A MESSAGE TO THE CHANNEL USING THE CONTEXT OBJECT.
 
 
 ##############Responds to mcping###########################################################################################
-@slash.slash(
+@bot.command(
 	description="Responds with player count and server latency", 	# ADDS THIS VALUE TO THE $HELP PING MESSAGE.
 )
-async def serverstatus(ctx:SlashContext):
-    server = MinecraftServer.lookup(SERVER)
+async def serverstatus(ctx):
+    server = JavaServer.lookup(SERVER)
     status = server.status()
 
     await ctx.send("The server has {0} players and replied in {1} ms".format(status.players.online, status.latency)) # SENDS A MESSAGE TO THE CHANNEL USING THE CONTEXT OBJECT.
